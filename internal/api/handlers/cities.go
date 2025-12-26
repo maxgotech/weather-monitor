@@ -1,17 +1,19 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
-
-	"weather-monitor/internal/models"
 )
 
 func (h *Handlers) ListCities(w http.ResponseWriter, r *http.Request) {
-	cities := make([]models.City, 0, len(models.AvailableCities))
+	cities, err := h.db.ListCities(context.Background())
+	if err != nil {
+		RespondJSON(w, http.StatusInternalServerError, map[string]string{
+			"error": err.Error(),
+		})
 
-	for _, city := range models.AvailableCities {
-		cities = append(cities, city)
+		return
 	}
 
 	RespondJSON(w, http.StatusOK, cities)
@@ -25,28 +27,52 @@ func (h *Handlers) SaveUserCity(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewDecoder(r.Body).Decode(&req)
 
-	models.Users[req.Email].City = req.City
+	err := h.db.UpdateUserCity(context.Background(), req.Email, req.City)
+	if err != nil {
+		RespondJSON(w, http.StatusInternalServerError, map[string]string{
+			"error": err.Error(),
+		})
+
+		return
+	}
 	RespondJSON(w, http.StatusCreated, nil)
 }
 
 func (h *Handlers) GetUserCity(w http.ResponseWriter, r *http.Request) {
 	userEmail := r.URL.Query().Get("email")
-	entry, exists := models.Users[userEmail]
-	if !exists {
-		RespondJSON(w, http.StatusNotFound, map[string]string{
-			"error": "user not found",
+
+	userWithCity, err := h.db.GetUserWithCity(context.Background(), userEmail)
+	if err != nil {
+		RespondJSON(w, http.StatusInternalServerError, map[string]string{
+			"error": err.Error(),
 		})
 
 		return
 	}
 
-	if entry.City == "" {
-		entry.City = "Moscow"
+	if userWithCity.City == nil {
+		err := h.db.UpdateUserCity(context.Background(), userEmail, "Moscow")
+		if err != nil {
+			RespondJSON(w, http.StatusInternalServerError, map[string]string{
+				"error": err.Error(),
+			})
+
+			return
+		}
+
+		userWithCity, err = h.db.GetUserWithCity(context.Background(), userEmail)
+		if err != nil {
+			RespondJSON(w, http.StatusInternalServerError, map[string]string{
+				"error": err.Error(),
+			})
+
+			return
+		}
 	}
 
 	RespondJSON(w, http.StatusOK, map[string]string{
-		"user": entry.Email,
-		"city": entry.City,
+		"user": userWithCity.Email,
+		"city": userWithCity.City.Name,
 	},
 	)
 }

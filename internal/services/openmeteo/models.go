@@ -1,4 +1,4 @@
-package services
+package openmeteo
 
 type WeatherResponse struct {
 	CurrentWeather CurrentWeather `json:"current_weather"`
