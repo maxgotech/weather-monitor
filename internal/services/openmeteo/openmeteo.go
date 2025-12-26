@@ -1,4 +1,4 @@
-package services
+package openmeteo
 
 import (
 	"weather-monitor/internal/config"

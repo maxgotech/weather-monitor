@@ -12,3 +12,8 @@ run:
 test:
 	go test ./...
 
+db:
+	docker compose up -d
+
+db-down:
+	docker compose down

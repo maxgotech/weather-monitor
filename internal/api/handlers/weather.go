@@ -1,19 +1,18 @@
 package handlers
 
 import (
+	"context"
 	"net/http"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
-
-	"weather-monitor/internal/models"
 )
 
 func (h *Handlers) GetWeatherByCity(w http.ResponseWriter, r *http.Request) {
 	city := strings.ToLower(chi.URLParam(r, "city"))
 
-	coords, ok := models.AvailableCities[city]
-	if !ok {
+	coords, err := h.db.GetCityByName(context.Background(), city)
+	if err != nil {
 		RespondJSON(w, http.StatusNotFound, map[string]string{
 			"error": "city not found",
 		})

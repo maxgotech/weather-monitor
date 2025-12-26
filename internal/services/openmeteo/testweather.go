@@ -1,4 +1,4 @@
-package services
+package openmeteo
 
 func (om *OpenMeteo) GetTestWeather(lat, lon float64) (*WeatherResponse, error) {
 	data := WeatherResponse{

@@ -1,10 +1,11 @@
 package models
 
-type User struct {
-	ID       string
-	Email    string
-	Password string
-	City     string
-}
+import "github.com/google/uuid"
 
-var Users = map[string]*User{}
+type User struct {
+	ID       uuid.UUID  `db:"id" json:"id"`
+	Email    string     `db:"email" json:"email"`
+	Password string     `db:"password" json:"-"`
+	CityID   *uuid.UUID `db:"city_id" json:"-"`
+	*City    `json:"city,omitempty"`
+}

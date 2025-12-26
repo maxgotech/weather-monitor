@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"time"
@@ -11,10 +12,12 @@ import (
 
 	"weather-monitor/internal/api/handlers"
 	"weather-monitor/internal/config"
-	"weather-monitor/internal/services"
+	"weather-monitor/internal/services/db"
+	"weather-monitor/internal/services/openmeteo"
 )
 
 func main() {
+	ctx := context.Background()
 	var cfg config.Config
 	err := env.Parse(&cfg)
 	if err != nil {
@@ -28,8 +31,12 @@ func main() {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(60 * time.Second))
 
-	openMeteoService := services.NewOpenMeteo(cfg)
-	handlers := handlers.NewHandlers(openMeteoService)
+	openMeteoService := openmeteo.NewOpenMeteo(cfg)
+	databaseService, err := db.NewDatabase(ctx, cfg.DB)
+	if err != nil {
+		log.Fatal(err)
+	}
+	handlers := handlers.NewHandlers(openMeteoService, databaseService)
 
 	// Routes
 	r.Get("/health", handlers.HealthHandler)
