@@ -1,3 +1,6 @@
+include .env
+export
+
 APP_NAME=weather-monitor
 CMD_DIR=./cmd/weather-monitor
 
