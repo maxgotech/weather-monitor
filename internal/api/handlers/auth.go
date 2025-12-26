@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -24,9 +23,8 @@ func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
 		Password: req.Password,
 	}
 
-	users[user.Email] = user
+	models.Users[user.Email] = user
 	w.WriteHeader(http.StatusCreated)
-	fmt.Print(users)
 }
 
 func (h *Handlers) Login(w http.ResponseWriter, r *http.Request) {
@@ -37,8 +35,7 @@ func (h *Handlers) Login(w http.ResponseWriter, r *http.Request) {
 
 	json.NewDecoder(r.Body).Decode(&req)
 
-	fmt.Print(users)
-	user, ok := users[req.Email]
+	user, ok := models.Users[req.Email]
 	if !ok || user.Password != req.Password {
 		http.Error(w, "invalid credentials", http.StatusUnauthorized)
 		return

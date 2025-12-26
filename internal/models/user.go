@@ -6,3 +6,5 @@ type User struct {
 	Password string
 	City     string
 }
+
+var Users = map[string]*User{}

@@ -26,13 +26,13 @@ func (h *Handlers) SaveUserCity(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewDecoder(r.Body).Decode(&req)
 
-	users[userID].City = req.City
+	models.Users[userID].City = req.City
 	w.WriteHeader(http.StatusOK)
 }
 
 func (h *Handlers) GetUserCity(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("userID").(string)
 	json.NewEncoder(w).Encode(map[string]string{
-		"city": users[userID].City,
+		"city": models.Users[userID].City,
 	})
 }

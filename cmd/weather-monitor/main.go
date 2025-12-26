@@ -42,6 +42,8 @@ func main() {
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Get("/cities", handlers.ListCities)
 		r.Get("/weather/{city}", handlers.GetWeatherByCity)
+		r.Get("/user/city", handlers.GetUserCity)
+		r.Post("/user/city", handlers.SaveUserCity)
 	})
 
 	log.Println("Server running on :8080")
