@@ -14,25 +14,39 @@ func (h *Handlers) ListCities(w http.ResponseWriter, r *http.Request) {
 		cities = append(cities, city)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(cities)
+	RespondJSON(w, http.StatusOK, cities)
 }
 
 func (h *Handlers) SaveUserCity(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(string)
 
 	var req struct {
-		City string `json:"city"`
+		Email string `json:"email"`
+		City  string `json:"city"`
 	}
 	json.NewDecoder(r.Body).Decode(&req)
 
-	models.Users[userID].City = req.City
-	w.WriteHeader(http.StatusOK)
+	models.Users[req.Email].City = req.City
+	RespondJSON(w, http.StatusCreated, nil)
 }
 
 func (h *Handlers) GetUserCity(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(string)
-	json.NewEncoder(w).Encode(map[string]string{
-		"city": models.Users[userID].City,
-	})
+	userEmail := r.URL.Query().Get("email")
+	entry, exists := models.Users[userEmail]
+	if !exists {
+		RespondJSON(w, http.StatusNotFound, map[string]string{
+			"error": "user not found",
+		})
+
+		return
+	}
+
+	if entry.City == "" {
+		entry.City = "Moscow"
+	}
+
+	RespondJSON(w, http.StatusOK, map[string]string{
+		"user": entry.Email,
+		"city": entry.City,
+	},
+	)
 }

@@ -24,7 +24,7 @@ func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	models.Users[user.Email] = user
-	w.WriteHeader(http.StatusCreated)
+	RespondJSON(w, http.StatusCreated, nil)
 }
 
 func (h *Handlers) Login(w http.ResponseWriter, r *http.Request) {
@@ -37,7 +37,14 @@ func (h *Handlers) Login(w http.ResponseWriter, r *http.Request) {
 
 	user, ok := models.Users[req.Email]
 	if !ok || user.Password != req.Password {
-		http.Error(w, "invalid credentials", http.StatusUnauthorized)
+		RespondJSON(w, http.StatusUnauthorized, map[string]string{
+			"error": "invalid credentials",
+		})
+
 		return
 	}
+
+	RespondJSON(w, http.StatusOK, map[string]string{
+		"message": "access granted",
+	})
 }

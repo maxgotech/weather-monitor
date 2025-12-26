@@ -5,6 +5,7 @@ import (
 )
 
 func (h *Handlers) HealthHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("OK"))
+	RespondJSON(w, http.StatusOK, map[string]string{
+		"message": "OK",
+	})
 }
