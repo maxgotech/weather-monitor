@@ -8,7 +8,7 @@ import (
 
 func (om *OpenMeteo) GetWeather(lat, lon float64) (*WeatherResponse, error) {
 	url := fmt.Sprintf(
-		"%s/v1/forecast?latitude=%f&longitude=%f&current_weather=true",
+		"%s/v1/forecast?latitude=%f&longitude=%f&wind_speed_unit=ms&current=temperature_2m,wind_speed_10m",
 		om.cfg.OpenMeteoApiURL, lat, lon,
 	)
 

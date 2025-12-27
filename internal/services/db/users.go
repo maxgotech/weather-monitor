@@ -50,7 +50,7 @@ func (d *Database) GetUserByEmail(
 	)
 
 	if err == pgx.ErrNoRows {
-		return nil, nil
+		return nil, err
 	}
 
 	return &user, err
