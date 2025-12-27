@@ -27,7 +27,7 @@ func (d *Database) GetCityByName(
 	)
 
 	if err == pgx.ErrNoRows {
-		return nil, nil
+		return nil, err
 	}
 
 	return &city, err
